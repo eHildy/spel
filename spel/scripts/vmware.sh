@@ -7,6 +7,7 @@ fi
 
 # Install the VMWare Tools from a linux ISO.
 echo "installing vmware tools"
+yum install open-vm-tools -y
 
 #wget http://192.168.0.185/linux.iso -P /tmp
 mkdir -p /mnt/vmware

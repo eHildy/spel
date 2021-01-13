@@ -1,5 +1,26 @@
 {
     "builders": [
+      {
+            "boot_command": [
+                "<esc><wait>",
+                "linux ks=http://{{.HTTPIP}}:{{.HTTPPort}}/ks.centos7.minimal.cfg VAGRANT",
+                "<enter><wait>"
+            ],
+          "http_directory": "{{ template_dir }}/kickstarts",
+          "type": "vmware-iso",
+          "name": "minimal-centos7-vmware",
+          "guest_os_type": "centos-64",
+          "ssh_username": "vagrant",
+          "ssh_password": "vagrant",
+          "ssh_pty": "true",
+          "ssh_timeout": "1h",
+          "boot_wait": "20s",
+          "iso_url": "{{user `iso_url_centos7`}}",
+          "iso_checksum": "{{user `iso_checksum`}}",
+          "shutdown_command": "echo 'vagrant' | sudo -S /sbin/halt -h -p",
+          "vmx_remove_ethernet_interfaces": true,
+          "disk_size": "20480"
+        },
         {
             "boot_command": [
                 "<esc><wait>",
@@ -228,6 +249,14 @@
         }
     ],
     "post-processors": [
+       {
+            "type": "vagrant",
+            "keep_input_artifact": false,
+            "output": "{{.Provider}}_centos_base.box",
+            "only": [
+              "minimal-centos7-vmware"
+            ]
+        },
         [
             {
                 "files": [
@@ -268,7 +297,8 @@
         {
             "destination": "/tmp/retry.sh",
             "only": [
-                "minimal-centos-7-virtualbox"
+                "minimal-centos-7-virtualbox",
+                "minimal-centos7-vmware"
             ],
             "source": "{{ template_dir }}/scripts/retry.sh",
             "type": "file"
@@ -276,7 +306,8 @@
         {
             "execute_command": "echo 'vagrant'|sudo -S -E /bin/sh -ex '{{ .Path }}'",
             "only": [
-                "minimal-centos-7-virtualbox"
+                "minimal-centos-7-virtualbox",
+                "minimal-centos7-vmware"
             ],
             "scripts": [
                 "{{ template_dir }}/scripts/base.sh",
